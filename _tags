@@ -1,2 +1,2 @@
-true: package(batteries), package(core)
+true: package(core)
 

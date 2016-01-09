@@ -1,14 +1,4 @@
-open Batteries;;
-
-module House = struct
-  type t = int * int
-  let compare (x0,y0) (x1,y1) =
-    match Pervasives.compare x0 x1 with
-    | 0 -> Pervasives.compare y0 y1
-    | c -> c
-end
-
-module HouseSet = Set.Make(House)
+open Core.Std;;
 
 let next_house (x, y) c = match c with
   | '<' -> (x - 1, y)
@@ -20,7 +10,7 @@ let next_house (x, y) c = match c with
 
 let shift item l = match l with
   | [] -> [item]
-  | h :: t -> t @ [item]
+  | _ :: t -> t @ [item]
 ;;
 
 let rec repeat n item = match n with
@@ -29,19 +19,31 @@ let rec repeat n item = match n with
 ;;
 
 let visit n string =
-  let start = repeat n (HouseSet.add (0,0) HouseSet.empty, (0,0)) in
-  let final = Enum.fold (fun l c ->
-      let (set, house) = List.hd l in
+  let start = repeat n (Set.add Set.Poly.empty (0,0), (0,0)) in
+  let final = List.fold ~init:start ~f:(fun l c ->
+      let (set, house) = List.hd_exn l in
       let next = next_house house c in
-      shift ((HouseSet.add next set), next) l) start (String.enum string) in
-  let set = List.fold_left (fun acc (set, _) -> HouseSet.union acc set) HouseSet.empty final in
-  HouseSet.cardinal set
+      shift ((Set.add set next), next) l) (String.to_list string) in
+  let set = List.fold ~init:Set.Poly.empty ~f:(fun acc (set, _) -> Set.union acc set) final in
+  Set.length set
 ;;
 
-let day3 string =
-  visit 1 string
+let read_lines filename = In_channel.with_file filename ~f:(fun file ->
+  In_channel.input_lines file)
 ;;
 
-let day3_2 string =
-  visit 2 string
+let day3 filename =
+  let s = List.hd_exn (read_lines filename) in
+  visit 1 s
 ;;
+
+let day3_2 filename =
+  let s = List.hd_exn (read_lines filename) in
+  visit 2 s
+;;
+
+let run filename =
+  Printf.printf "day3 : %d\n" (day3 filename);
+  Printf.printf "day3_2 : %d\n" (day3_2 filename)
+;;
+
