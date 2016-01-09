@@ -1,4 +1,4 @@
-open Batteries;;
+open Core.Std;;
 
 let perimeter x y = 
   2 * x + 2 * y
@@ -22,15 +22,29 @@ let apply f list = match list with
 ;;
 
 let parse_line l = 
-  List.map (fun s -> String.to_int s) (String.nsplit l "x")
+  List.map ~f:(fun s -> Int.of_string s) (String.split ~on:'x' l)
 ;;
 
-let day2 lines = 
-  Enum.fold (fun amount line -> 
-      amount + apply calc_paper (parse_line line)) 0 lines
+let read_lines filename = In_channel.with_file filename ~f:(fun file ->
+  In_channel.input_lines file)
 ;;
 
-let day2_2 lines = 
-  Enum.fold (fun amount line -> 
-      amount + apply calc_ribbon (parse_line line)) 0 lines
+let calc ~f lines = 
+  List.fold ~init:0 ~f:(fun amount line -> 
+      amount + apply f (parse_line line)) lines
+;;
+
+let day2 filename =
+  let lines = read_lines filename in 
+  calc ~f:calc_paper lines
+;;
+
+let day2_2 filename = 
+  let lines = read_lines filename in 
+  calc ~f:calc_ribbon lines
+;;
+
+let run filename =
+  Printf.printf "day2 : %d\n" (day2 filename);
+  Printf.printf "day2_2 : %d\n" (day2_2 filename)
 ;;
