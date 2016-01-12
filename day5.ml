@@ -46,3 +46,7 @@ let day5 filename =
   List.length (List.filter ~f:is_nice lines)
 ;;
 
+let run filename = 
+  Printf.printf "day5: %d\n" (day5 filename)
+;;
+
