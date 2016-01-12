@@ -22,8 +22,8 @@ let analyze_string s =
   let rec analyze_string (vowels, pairs, bad_pairs) cs = match cs with
     | [] -> (vowels, pairs, bad_pairs)
     | [x] -> (inc_vowel vowels x, pairs, bad_pairs)
+    | h :: n :: t when is_naughty_pair (h, n) -> (0, 0, 1)
     | h :: n :: t -> 
-      if is_naughty_pair (h, n) then (0, 0, 1) else
       let counts = (inc_vowel vowels h, inc_pair pairs h n, 0) in
       analyze_string counts (n :: t) in
   analyze_string (0, 0, 0) (String.to_list s)
