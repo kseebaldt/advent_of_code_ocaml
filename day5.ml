@@ -14,10 +14,6 @@ let inc_vowel v c =
   if is_vowel c then v + 1 else v
 ;;
 
-let inc_bad_pair count a b =
-  if is_naughty_pair (a, b) then count + 1 else count
-;;
-
 let inc_pair count a b = 
   if a = b then count + 1 else count
 ;;
@@ -27,7 +23,8 @@ let analyze_string s =
     | [] -> (vowels, pairs, bad_pairs)
     | [x] -> (inc_vowel vowels x, pairs, bad_pairs)
     | h :: n :: t -> 
-      let counts = (inc_vowel vowels h, inc_pair pairs h n, inc_bad_pair bad_pairs h n) in
+      if is_naughty_pair (h, n) then (0, 0, 1) else
+      let counts = (inc_vowel vowels h, inc_pair pairs h n, 0) in
       analyze_string counts (n :: t) in
   analyze_string (0, 0, 0) (String.to_list s)
 ;;
