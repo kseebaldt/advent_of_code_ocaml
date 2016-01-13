@@ -1,8 +1,14 @@
 open Core.Std;;
 
+type day6_functions = {
+  turn_on : int -> int ;
+  turn_off : int -> int ;
+  toggle : int -> int ;
+};;
+
 let coords str = 
-  let [x; y] = String.split ~on:',' str in
-  (Int.of_string x, Int.of_string y)
+  let ints = List.map (String.split ~on:',' str) ~f:Int.of_string in
+  (List.hd_exn ints, List.hd_exn (List.tl_exn ints))
 ;;
 
 let apply ~f:f ~array:a tl br =
@@ -16,38 +22,46 @@ let apply ~f:f ~array:a tl br =
   done
 ;;
 
-let turn_on v = 
-  1
-;;
-
-let turn_off v = 
-  0
-;;
-
-let toggle v = 
-  (v + 1) mod 2
-;;
-
-let eval_tokens l a = match l with
-  | "turn" :: "on" :: tl :: "through" :: br :: [] -> apply ~f:turn_on ~array:a tl br
-  | "turn" :: "off" :: tl :: "through" :: br :: [] -> apply ~f:turn_off ~array:a tl br
-  | "toggle" :: tl :: "through" :: br :: [] -> apply ~f:toggle ~array:a tl br
+let eval_tokens funs l a = match l with
+  | "turn" :: "on" :: tl :: "through" :: br :: [] -> apply ~f:funs.turn_on ~array:a tl br
+  | "turn" :: "off" :: tl :: "through" :: br :: [] -> apply ~f:funs.turn_off ~array:a tl br
+  | "toggle" :: tl :: "through" :: br :: [] -> apply ~f:funs.toggle ~array:a tl br
   | _ -> ()
 
 ;;
 
-let eval_string s a =
-  eval_tokens (String.split ~on:' ' s) a
+let eval_string funs s a =
+  eval_tokens funs (String.split ~on:' ' s) a
 ;;
 
 let read_lines filename = In_channel.with_file filename ~f:(fun file ->
   In_channel.input_lines file)
 ;;
 
-let day6 filename = 
+let eval_lines funs lines =
   let a = Array.create ~len:(1000 * 1000) 0 in
-  let lines = read_lines filename in
-  List.iter lines ~f:(fun s -> eval_string s a);
+  List.iter lines ~f:(fun s -> eval_string funs s a);
   Array.fold a ~init:0 ~f:(fun acc i -> acc + i)
 ;;
 
+let part1 = {
+  turn_on = (fun _ -> 1);
+  turn_off = (fun _ -> 0);
+  toggle = (fun x -> (x + 1) mod 2)
+};;
+
+let part2 = {
+  turn_on = (fun x -> x + 1);
+  turn_off = (fun x -> if (x - 1) < 0 then 0 else x - 1);
+  toggle = (fun x -> x + 2)
+};;
+
+let day6 funs filename = 
+  let lines = read_lines filename in
+  eval_lines funs lines
+;;
+
+let run filename = 
+  Printf.printf "day6: %d\n" (day6 part1 filename);
+  Printf.printf "day6_2: %d\n" (day6 part2 filename)
+;;
