@@ -1,6 +1,5 @@
 open Day5;;
 
 let () =
- run "input5.txt" 
+ run "data/input5.txt" 
 ;;
-

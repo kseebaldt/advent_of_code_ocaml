@@ -1,6 +1,5 @@
 open Day1;;
 open Core.Std;;
 
-let () = run "input1.txt"
+let () = run "data/input1.txt"
 ;;
-
